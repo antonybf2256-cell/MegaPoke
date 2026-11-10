@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel — MegaPokeStore</title>
+<link rel="icon" href="img/LOGO.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B0B0C;--paper:#F6F4F1;--card:#fff;--line:#E7E2DA;--red:#C8102E;--gold:#F5B400;--mute:#6E655C;--ok:#1E7B4B}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;font:15px/1.45 Inter,system-ui,sans-serif;background:var(--paper);color:var(--ink)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 14px;font-weight:600}
+button:hover{border-color:var(--ink)}
+.primario{background:var(--red);border-color:var(--red);color:#fff}.primario:hover{background:#a50d26;border-color:#a50d26}
+.peligro{color:var(--red)}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fff}
+label{display:flex;flex-direction:column;gap:5px;font-weight:600;font-size:13.5px}
+small{color:var(--mute);font-weight:400}
+
+#gate{min-height:100vh;display:grid;place-items:center;padding:20px}
+.gate-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:32px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:14px}
+.gate-card h1{margin:0;font-size:22px;font-weight:800}.gate-card p{margin:0;color:var(--mute)}
+.err{color:var(--red);font-weight:600;min-height:1.2em;margin:0}
+code{background:var(--paper);padding:2px 6px;border-radius:5px;word-break:break-all;font-size:13px}
+
+#app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{background:var(--ink);color:#fff;padding:22px 16px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.marca{font-weight:800;font-size:17px;margin-bottom:2px}.marca-sub{color:#a9a29a;font-size:12.5px;margin-bottom:18px}
+aside nav{display:flex;flex-direction:column;gap:4px}
+aside nav button{background:none;border:0;border-left:3px solid transparent;border-radius:0 8px 8px 0;text-align:left;color:#d8d2ca;padding:10px 12px}
+aside nav button:hover{background:#1c1c1e}
+aside nav button.on{border-left-color:var(--gold);color:#fff;background:#1c1c1e}
+.pie{margin-top:auto;display:flex;flex-direction:column;gap:8px;font-size:13px;color:#a9a29a}
+.pie a{color:var(--gold);font-weight:600}.pie button{background:none;border-color:#3a3a3d;color:#fff}
+main{padding:28px clamp(16px,4vw,44px);max-width:1000px;width:100%}
+.cab{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.cab h2{margin:0;font-size:24px;font-weight:800}
+.ayuda{color:var(--mute);margin:0 0 18px}
+.lista{display:flex;flex-direction:column;gap:8px}
+.fila{display:grid;grid-template-columns:64px 1fr 130px auto auto auto auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.fila.off{opacity:.55}.fila b{display:block}
+.fila>div small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:36ch}
+.mini{width:64px;height:64px;border-radius:8px;background:var(--paper);object-fit:contain;display:grid;place-items:center;color:var(--mute);font-size:11px}
+.mini.ancho{object-fit:cover}
+.sw{flex-direction:row;align-items:center;gap:6px;font-weight:500}.sw input,.chk input{width:auto}
+.chk{flex-direction:row;align-items:center;gap:8px}
+.vacio{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:26px;text-align:center;color:var(--mute)}
+.vacio button{margin-top:10px}
+.ed-box{border:1px solid #d9d4de;border-radius:12px;padding:10px 14px 14px;margin:0 0 14px;display:grid;gap:10px}
+.ed-box legend{font-weight:700;padding:0 8px;color:#742284}
+dialog{border:0;border-radius:14px;padding:0;width:min(560px,94vw);max-height:92vh}
+dialog::backdrop{background:rgba(11,11,12,.55)}
+#frm{padding:24px;display:flex;flex-direction:column;gap:14px}#frm h3{margin:0;font-size:19px}
+.acciones{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+.prev{width:100%;height:150px;border:1px solid var(--line);border-radius:8px;background:var(--paper);display:grid;place-items:center;color:var(--mute);overflow:hidden}
+.prev img{max-width:100%;max-height:100%}
+.gal{display:flex;flex-wrap:wrap;gap:8px}
+.gal .th{position:relative;width:72px;height:72px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper)}
+.gal .th img{width:100%;height:100%;object-fit:cover}
+.gal .th button{position:absolute;top:2px;right:2px;width:20px;height:20px;padding:0;border-radius:50%;line-height:1;font-size:13px;cursor:pointer}
+.img-f{display:flex;flex-direction:column;gap:8px;font-weight:600;font-size:13.5px}
+.ped{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:grid;gap:6px}
+.ped header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ped ul{margin:0;padding-left:18px}.ped p{margin:0}
+.ped select{width:auto}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+@media(max-width:820px){
+ #app{grid-template-columns:1fr}
+ aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px}
+ .marca-sub{display:none}.marca{margin:0 8px 0 0}
+ aside nav{flex-direction:row;flex-wrap:wrap}aside nav button{border-left:0;border-bottom:3px solid transparent;border-radius:8px 8px 0 0}
+ aside nav button.on{border-bottom-color:var(--gold)}.pie{margin:0 0 0 auto;flex-direction:row;align-items:center}
+ .fila{grid-template-columns:64px 1fr;}.fila>*:nth-child(n+3){grid-column:2}
+}
+.etq-row{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}
+.etq-row input[type=text]{flex:1;min-width:150px}
+.etq-row input[type=color]{width:42px;height:34px;padding:2px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer}
+.etq-chip{font-size:.72rem;font-weight:800;padding:4px 10px;border-radius:6px;min-width:70px;text-align:center}
+.cup-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;align-items:end;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:16px}
+.cup-2{display:grid;grid-template-columns:1fr auto;gap:8px}.cup-2 select{width:auto}.cup-2 input{min-width:0}
+.cup{display:grid;grid-template-columns:minmax(110px,1fr) 1.2fr 1.4fr auto auto auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.cup.off{opacity:.55}.cup b.cod{font-size:17px;letter-spacing:.04em}.cup small{display:block}
+.cup .ok{color:#1a7f37;font-weight:700}.cup .vencido{color:var(--red);font-weight:700}
+@media(max-width:760px){.cup{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <form class="gate-card" id="gLogin">
+    <h1>Panel de administración</h1>
+    <p>Solo para el equipo de MegaPokeStore.</p>
+    <label>Correo<input type="email" name="email" autocomplete="username" required></label>
+    <label>Contraseña<input type="password" name="pass" autocomplete="current-password" required></label>
+    <p class="err" id="gErr"></p>
+    <button class="primario">Ingresar</button>
+    <button type="button" id="gGoogle">Ingresar con Google</button>
+  </form>
+  <div class="gate-card" id="gNo" hidden>
+    <h1>Sin permisos</h1>
+    <p>La cuenta <b id="noMail"></b> no es de administrador.</p>
+    <p>Si eres el dueño de la tienda, agrega este ID en Firestore, en la colección <code>admins</code> (ID del documento):</p>
+    <code id="noUid"></code>
+    <button id="noSalir">Cerrar sesión</button>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <aside>
+    <div class="marca">MegaPokeStore</div><div class="marca-sub">Panel de administración</div>
+    <nav id="nav">
+      <button data-v="sobres" class="on">Productos</button>
+      <button data-v="singles">Cartas</button>
+      <button data-v="mazos">Mazos</button>
+      <button data-v="accesorios">Accesorios</button>
+      <button data-v="selladas">Selladas</button>
+      <button data-v="banners">Dinámicas</button>
+      <button data-v="textos">Textos</button>
+      <button data-v="pedidos">Pedidos</button>
+      <button data-v="cupones">Cupones</button>
+    </nav>
+    <div class="pie"><span id="yo"></span><a href="index.html">Ver la tienda</a><button id="salir">Cerrar sesión</button></div>
+  </aside>
+
+  <main>
+    <section id="v-productos" data-col="productos">
+      <div class="cab"><h2>Productos</h2><button class="primario" data-nuevo>Nuevo producto</button></div>
+      <p class="ayuda">Lo que cambies aquí se ve en la tienda al recargar la página.</p>
+      <div class="lista"></div>
+    </section>
+
+    <section id="v-banners" data-col="banners" hidden>
+      <div class="cab"><h2>Dinámicas</h2><button class="primario" data-nuevo>Nueva dinámica</button></div>
+      <p class="ayuda">Cada dinámica sale en el carrusel del inicio y en la página “Dinámicas”, con su precio. Edita cada una o agrega más; usa “Posición” para cambiar el orden. Mejor si las imágenes son horizontales.</p>
+      <div class="lista"></div>
+    </section>
+
+    <section id="v-textos" hidden>
+      <div class="cab"><h2>Textos</h2></div>
+      <p class="ayuda">Mensaje de la franja negra que aparece arriba de toda la tienda.</p>
+      <label>Mensaje de la barra superior<input id="avisoBarra" maxlength="140" placeholder="Envíos a todo el Perú gratis"></label>
+      <p><button class="primario" id="gTextos">Guardar cambios</button></p>
+
+      <div class="cab" style="margin-top:28px"><h2>Filtro de expansiones</h2></div>
+      <p class="ayuda">Aparece en el filtro lateral de cada categoría. Cambia el título y los nombres; deja un campo vacío para ocultar esa expansión. Al renombrar una, los productos que la tenían se actualizan solos. Las etiquetas (Nuevo, Top ventas…) no se tocan.</p>
+      <label>Título del filtro<input id="tituloFiltro" maxlength="40" placeholder="Filtrar por expansión"></label>
+      <div id="expLista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px"></div>
+      <p><button class="primario" id="gExp">Guardar expansiones</button></p>
+
+    </section>
+
+    <section id="v-pedidos" hidden>
+      <div class="cab"><h2>Pedidos</h2>
+        <button class="primario" id="bExcel">Descargar Excel</button>
+        <select id="fEst" style="width:auto"><option value="">Todos los estados</option><option>pendiente</option><option>pagado</option><option>enviado</option><option>entregado</option><option>cancelado</option></select>
+      </div>
+      <p class="ayuda">Cambia el estado y el cliente lo verá en su historial de compras.</p>
+      <div id="pedLista"></div>
+    </section>
+
+    <section id="v-cupones" hidden>
+      <div class="cab"><h2>Cupones</h2></div>
+      <p class="ayuda">Crea un código de descuento con el nombre que quieras. Empieza a contar su duración desde que lo creas.</p>
+      <form id="cupForm" class="cup-form">
+        <label>Código
+          <div class="cup-2"><input id="cCod" maxlength="20" placeholder="Ej. TIKTOK10" autocomplete="off" required><button type="button" id="cGen">Generar</button></div>
+        </label>
+        <label>Descuento
+          <input id="cTipo" type="hidden" value="porcentaje">
+          <select id="cVal" required><option value="5">5%</option><option value="10">10%</option><option value="15">15%</option><option value="20">20%</option><option value="25">25%</option><option value="30">30%</option><option value="35">35%</option><option value="40">40%</option><option value="45">45%</option><option value="50">50%</option><option value="55">55%</option><option value="60">60%</option><option value="65">65%</option><option value="70">70%</option><option value="75">75%</option><option value="80">80%</option><option value="85">85%</option><option value="90">90%</option><option value="95">95%</option><option value="100">100%</option></select>
+        </label>
+        <label>Dura
+          <div class="cup-2"><input id="cDur" type="number" min="1" step="1" value="7" required><select id="cUni"><option value="d">días</option><option value="h">horas</option></select></div>
+        </label>
+        <button class="primario" id="cCrear">Crear cupón</button>
+      </form>
+      <div id="cupLista"></div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg"><form id="frm"></form></dialog>
+<div id="toast" role="status"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyCFbgBbjUniMgaOKpfuYqzfWJPfaIW-SMQ",authDomain:"megapokestore.firebaseapp.com",projectId:"megapokestore",
+  storageBucket:"megapokestore.firebasestorage.app",messagingSenderId:"208764573725",appId:"1:208764573725:web:1fec2dbb03f836ca6c4ef4"
+});
+const auth=firebase.auth(),db=firebase.firestore();
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let tt;const aviso=m=>{const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2200)};
+
+const CATS={sobres:"Productos",singles:"Cartas",mazos:"Mazos",accesorios:"Accesorios",selladas:"Selladas"};
+const NAVS={inicio:"Inicio",...CATS,dinamicas:"Dinámicas"};
+
+const EXPO={"":"Sin expansión"};let EXPS=[];
+const ESQ={
+ productos:[
+  {k:"name",l:"Nombre",t:"text",req:1,ed:"es"},
+  {k:"desc",l:"Descripción corta",t:"textarea",ed:"es"},
+  {k:"contenido",l:"Contenido del producto (una línea por elemento, ej. “10 cartas por sobre”)",t:"lines",ed:"es"},
+  {k:"tag",l:"Etiqueta (ej. Nuevo, Top ventas)",t:"text",ed:"es"},
+  {k:"price",l:"Precio (S/)",t:"number",req:1,ed:"es"},
+  {k:"stock",l:"Stock (unidades disponibles)",t:"number",int:1,req:1,ed:"es"},
+  {k:"name_en",l:"Name (EN) — si lo dejas vacío se usa el nombre en español",t:"text",ed:"en"},
+  {k:"desc_en",l:"Short description (EN) — vacío = descripción en español",t:"textarea",ed:"en"},
+  {k:"contenido_en",l:"Contents (EN) (una línea por elemento) — vacío = contenido en español",t:"lines",ed:"en"},
+  {k:"tag_en",l:"Tag (EN) (ej. New, Best seller) — vacío = etiqueta en español",t:"text",ed:"en"},
+  {k:"price_en",l:"Precio edición EN (S/)",t:"number",req:1,ed:"en"},
+  {k:"stock_en",l:"Stock edición EN (unidades disponibles)",t:"number",int:1,req:1,ed:"en"},
+  {k:"expansion",l:"Expansión (para el filtro de la tienda, común a ES y EN)",t:"select",o:EXPO},
+  {k:"category",l:"Categoría",t:"select",o:CATS},
+  {k:"holo",l:"Mostrar sello NUEVO",t:"check"},
+  {k:"etiquetas",l:"Etiquetas adicionales (texto y color)",t:"etiquetas",max:4},
+  {k:"image",l:"Imagen (común a ES y EN)",t:"image",w:480,lim:90000},
+  {k:"images",l:"Imágenes adicionales (rotan cada 3 s al abrir el producto)",t:"images",w:640,lim:60000,max:5},
+  {k:"activo",l:"Visible en la tienda",t:"check",def:1}],
+ banners:[
+  {k:"image",l:"Imagen de la dinámica",t:"image",w:1400,lim:420000},
+  {k:"eyebrow",l:"Texto pequeño (arriba)",t:"text"},
+  {k:"title",l:"Título",t:"textarea",req:1,max:140},
+  {k:"precio",l:"Precio de participación (S/) — 0 = sin precio",t:"number"},
+  {k:"precioNota",l:"Nota del precio (ej. por cupo, por sobre)",t:"text"},
+  {k:"ctaLabel",l:"Texto del botón",t:"text",d:"Unirme"},
+  {k:"ctaNav",l:"El botón lleva a",t:"select",o:NAVS},
+  {k:"orden",l:"Posición (1 = primero)",t:"number"},
+  {k:"activo",l:"Visible en la tienda",t:"check",def:1}]
+};
+const thumb=(s,w)=>s?`<img class="mini${w?" ancho":""}" src="${esc(s)}" alt="">`:`<div class="mini">Sin imagen</div>`;
+const COLS={
+ productos:{nuevo:"Nuevo producto",fila:d=>[thumb(d.image),`<b>${esc(d.name)}</b><small>${esc(d.desc)}</small>`,esc(CATS[d.category])+"<small>S/ "+Number(d.price).toFixed(2)+"</small>",(typeof d.stock==="number"?(d.stock<=0?"<b style='color:#b42318'>Agotado</b>":"Stock: <b>"+d.stock+"</b>"):"<small>Sin stock cargado</small>")+"<small>EN: S/ "+(Number(d.price_en)>0?Number(d.price_en).toFixed(2):"—")+" · "+(typeof d.stock_en==="number"?"stock "+d.stock_en:"sin stock")+"</small>"]},
+ banners:{nuevo:"Nueva dinámica",fila:d=>[thumb(d.image,1),`<b>${esc(d.title)}</b><small>${esc(d.eyebrow)}</small>`,"Posición "+(d.orden||"—")+`<small>${Number(d.precio)>0?"Precio: S/ "+Number(d.precio).toFixed(2):"Sin precio"}</small>`]}
+};
+const datos={};let catFiltro="",imgTmp="",imgsTmp=[],etqTmp=[],editando=null,colAct="";
+
+const gate=(v,m)=>{$("#gLogin").hidden=v!=="login";$("#gNo").hidden=v!=="no";$("#gate").hidden=v==="app";$("#app").hidden=v!=="app";if(m!=null)$("#gErr").textContent=m};
+auth.onAuthStateChanged(async u=>{
+  if(!u)return gate("login","");
+  try{
+    const s=await db.collection("admins").doc(u.uid).get();
+    if(!s.exists)throw 0;
+    $("#yo").textContent=u.email;gate("app");cargarConfig();ir("sobres");
+  }catch(e){$("#noMail").textContent=u.email||"";$("#noUid").textContent=u.uid;gate("no")}
+});
+$("#gLogin").addEventListener("submit",e=>{e.preventDefault();const f=e.target;
+  auth.signInWithEmailAndPassword(f.email.value.trim(),f.pass.value).catch(()=>gate("login","Correo o contraseña incorrectos."))});
+$("#gGoogle").onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(()=>gate("login","No se pudo ingresar con Google."));
+$("#salir").onclick=$("#noSalir").onclick=()=>auth.signOut();
+
+function ir(v){
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  const vista=CATS[v]?"productos":v;
+  if(CATS[v]){catFiltro=v;document.querySelector("#v-productos h2").textContent=CATS[v]}
+  document.querySelectorAll("main>section").forEach(s=>s.hidden=s.id!=="v-"+vista);
+  if(COLS[vista])cargar(vista);else if(v==="pedidos")cargarPedidos();else if(v==="cupones")cargarCupones();else if(v==="textos")cargarTextos();
+}
+$("#nav").onclick=e=>{const b=e.target.closest("button");if(b)ir(b.dataset.v)};
+
+async function cargar(col){
+  const s=await db.collection(col).get();
+  datos[col]=s.docs.map(d=>({_id:d.id,...d.data()})).sort((a,b)=>(a.orden||0)-(b.orden||0));
+  const A=datos[col],L=(col==="productos"&&catFiltro)?A.filter(d=>(d.category||"")===catFiltro):A,c=COLS[col];
+  document.querySelector(`#v-${col} .lista`).innerHTML=L.length?L.map(d=>`
+   <div class="fila${d.activo===false?" off":""}">${c.fila(d).map(x=>`<div>${x}</div>`).join("")}
+    <label class="sw"><input type="checkbox" data-act="${esc(d._id)}" ${d.activo!==false?"checked":""}>Visible</label>
+    <button data-ed="${esc(d._id)}">Editar</button><button class="peligro" data-del="${esc(d._id)}">Eliminar</button></div>`).join("")
+   :A.length?`<div class="vacio">Aún no hay nada en esta sección.<br><button class="primario" data-nuevo>Agregar el primero</button></div>`
+   :`<div class="vacio">Todavía no administras esto desde aquí.<br>Si importas lo que tu tienda tiene hoy, podrás editarlo todo.<br><button class="primario" data-imp>Importar lo actual de la tienda</button></div>`;
+}
+document.querySelectorAll("section[data-col]").forEach(sec=>sec.addEventListener("click",async e=>{
+  const col=sec.dataset.col,t=e.target,g=a=>t.closest("["+a+"]")&&t.closest("["+a+"]").getAttribute(a);
+  if(t.closest("[data-nuevo]"))return abrir(col,null);
+  if(t.closest("[data-imp]"))return importar(col);
+  if(g("data-ed"))return abrir(col,datos[col].find(d=>d._id===g("data-ed")));
+  if(g("data-del")){const d=datos[col].find(x=>x._id===g("data-del"));
+    if(confirm("¿Eliminar “"+(d.name||d.title)+"”? Esto no se puede deshacer.")){await db.collection(col).doc(d._id).delete();aviso("Eliminado");cargar(col)}}
+}));
+document.querySelectorAll("section[data-col]").forEach(sec=>sec.addEventListener("change",async e=>{
+  const id=e.target.dataset.act;if(!id)return;
+  await db.collection(sec.dataset.col).doc(id).update({activo:e.target.checked});
+  aviso(e.target.checked?"Ahora es visible":"Oculto en la tienda");cargar(sec.dataset.col)}));
+
+async function importar(col){
+  try{
+    const src=await (await fetch("script.js")).text();
+    const m=src.match(new RegExp("const "+(col==="productos"?"PRODUCTS":"HERO_SLIDES")+" = (\\[[\\s\\S]*?\\n\\]);"));
+    const L=new Function("return "+m[1])(),b=db.batch();
+    L.forEach((x,i)=>{
+      const d=col==="productos"?{...x,tag:x.tag||"",desc:x.desc||"",image:x.image||"",activo:true,orden:i+1}
+        :{id:x.id,image:x.image||"",alt:x.alt||"",eyebrow:x.eyebrow||"",title:x.title||"",ctaLabel:x.cta.label,ctaNav:x.cta.nav,precio:0,precioNota:"",activo:true,orden:i+1};
+      b.set(db.collection(col).doc(String(x.id).replace(/[\/\s]+/g,"-")),d)});
+    await b.commit();aviso("Importado");cargar(col);
+  }catch(err){console.error(err);aviso("No se pudo importar. Abre el panel desde tu sitio publicado, no desde un archivo local.")}
+}
+
+function campo(f,v){
+  const val=v[f.k];
+  if(f.t==="check")return `<label class="chk"><input type="checkbox" name="${f.k}" ${(val===undefined?f.def:val)?"checked":""}>${f.l}</label>`;
+  if(f.t==="image")return `<div class="img-f">${f.l}<div class="prev" id="prev"></div><input type="file" accept="image/*" id="file"><button type="button" id="quitarImg">Quitar imagen</button><small>Se reduce sola para que la tienda cargue rápido.</small></div>`;
+  if(f.t==="etiquetas")return `<div class="img-f">${f.l}<div id="etqLista"></div><button type="button" id="etqAdd">+ Agregar etiqueta</button><small>Hasta ${f.max} etiquetas. Salen en la tarjeta y en la ventana del producto, con el color que elijas.</small></div>`;
+  if(f.t==="images")return `<div class="img-f">${f.l}<div class="gal" id="gal"></div><input type="file" accept="image/*" id="filesExtra" multiple><small>Hasta ${f.max} imágenes. Se reducen solas. La imagen principal va primero; estas se muestran después.</small></div>`;
+  if(f.t==="select")return `<label>${f.l}<select name="${f.k}">${Object.entries(f.o).map(([k,t])=>`<option value="${k}" ${val===k?"selected":""}>${t}</option>`).join("")}</select></label>`;
+  if(f.t==="lines")return `<label>${f.l}<textarea name="${f.k}" rows="5" maxlength="600" placeholder="Una línea por elemento">${esc(Array.isArray(val)?val.join("\n"):"")}</textarea></label>`;
+  if(f.t==="textarea")return `<label>${f.l}<textarea name="${f.k}" rows="2" maxlength="${f.max||160}" ${f.req?"required":""}>${esc(val)}</textarea></label>`;
+  const x=val!==undefined?val:(f.d||"");
+  return `<label>${f.l}<input name="${f.k}" type="${f.t}" ${f.t==="number"?(f.int?'step="1" min="0"':'step="0.01" min="0"'):""} value="${esc(x)}" ${f.req?"required":""} maxlength="140"></label>`;
+}
+function cuerpoForm(col,v){
+  const P=ESQ[col];
+  if(col!=="productos")return P.map(f=>campo(f,v)).join("");
+  const g=ed=>P.filter(f=>f.ed===ed).map(f=>campo(f,v)).join("");
+  return `<fieldset class="ed-box"><legend>🇵🇪 Español (ES)</legend>${g("es")}</fieldset>
+   <fieldset class="ed-box"><legend>🇬🇧 English (EN)</legend>${g("en")}</fieldset>
+   <fieldset class="ed-box"><legend>Común a ES y EN</legend>${P.filter(f=>!f.ed).map(f=>campo(f,v)).join("")}</fieldset>`;
+}
+function abrir(col,d){
+  if(d&&d.expansion&&!(d.expansion in EXPO))EXPO[d.expansion]=d.expansion;
+  colAct=col;editando=d;etqTmp=(d&&Array.isArray(d.etiquetas))?d.etiquetas.map(x=>({texto:x.texto||"",color:x.color||"#742284"})):[];imgTmp=d&&d.image||"";imgsTmp=(d&&Array.isArray(d.images))?d.images.slice():[];
+  const v=d||(col==="banners"?{orden:(datos.banners||[]).length+1}:col==="productos"?{category:catFiltro}:{});
+  $("#frm").innerHTML=`<h3>${d?"Editar":COLS[col].nuevo}</h3>${cuerpoForm(col,v)}
+   <div class="acciones"><button type="button" id="cancelar">Cancelar</button><button class="primario">Guardar cambios</button></div>`;
+  pintarPrev();
+  $("#cancelar").onclick=()=>$("#dlg").close();
+  $("#quitarImg").onclick=()=>{imgTmp="";pintarPrev()};
+  const f=ESQ[col].find(x=>x.t==="image");
+  $("#file").onchange=async e=>{
+    try{imgTmp=await comprimir(e.target.files[0],f.w,f.lim);pintarPrev()}catch(err){aviso("No se pudo usar esa imagen. Prueba con otra en JPG o PNG.")}};
+  const fe=ESQ[col].find(x=>x.t==="etiquetas");
+  if(fe){
+    pintarEtq();
+    $("#etqAdd").onclick=()=>{if(etqTmp.length>=fe.max)return aviso("Máximo "+fe.max+" etiquetas");etqTmp.push({texto:"",color:"#742284"});pintarEtq()};
+    $("#etqLista").onclick=e=>{const b=e.target.closest("[data-rme]");if(b){etqTmp.splice(Number(b.dataset.rme),1);pintarEtq()}};
+    $("#etqLista").oninput=e=>{const i=e.target.dataset.i,k=e.target.dataset.f;if(i==null||!etqTmp[i])return;etqTmp[i][k]=e.target.value;
+      const ch=e.target.closest(".etq-row").querySelector(".etq-chip");ch.textContent=etqTmp[i].texto||"Vista previa";ch.style.background=etqTmp[i].color;ch.style.color=colorTexto(etqTmp[i].color)};
+  }
+  const fx=ESQ[col].find(x=>x.t==="images");
+  if(fx){
+    pintarGal();
+    $("#gal").onclick=e=>{const b=e.target.closest("[data-rm]");if(b){imgsTmp.splice(Number(b.dataset.rm),1);pintarGal()}};
+    $("#filesExtra").onchange=async e=>{
+      const fs=[...e.target.files];let fallo=false;
+      for(const fl of fs){
+        if(imgsTmp.length>=fx.max){aviso("Máximo "+fx.max+" imágenes adicionales");break}
+        try{imgsTmp.push(await comprimir(fl,fx.w,fx.lim))}catch(err){fallo=true}
+      }
+      if(fallo)aviso("Alguna imagen no se pudo usar. Prueba con JPG o PNG.");
+      e.target.value="";pintarGal()};
+  }
+  $("#dlg").showModal();
+}
+const colorTexto=h=>{const m=/^#([0-9a-f]{6})$/i.exec(h||"");if(!m)return"#fff";const n=parseInt(m[1],16),l=(0.299*(n>>16)+0.587*((n>>8)&255)+0.114*(n&255))/255;return l>0.6?"#171717":"#fff"};
+const pintarEtq=()=>{$("#etqLista").innerHTML=etqTmp.length?etqTmp.map((e,i)=>`<div class="etq-row"><input type="text" data-i="${i}" data-f="texto" maxlength="24" placeholder="Ej. Oferta, Edición limitada" value="${esc(e.texto)}"><input type="color" data-i="${i}" data-f="color" value="${esc(e.color)}" title="Color de la etiqueta"><span class="etq-chip" style="background:${esc(e.color)};color:${colorTexto(e.color)}">${esc(e.texto)||"Vista previa"}</span><button type="button" data-rme="${i}" title="Quitar">×</button></div>`).join(""):"<small>Sin etiquetas adicionales</small>"};
+const pintarGal=()=>{$("#gal").innerHTML=imgsTmp.length?imgsTmp.map((s,i)=>`<div class="th"><img src="${esc(s)}" alt=""><button type="button" data-rm="${i}" title="Quitar">×</button></div>`).join(""):"<small>Sin imágenes adicionales</small>"};
+const pintarPrev=()=>{$("#prev").innerHTML=imgTmp?`<img src="${esc(imgTmp)}" alt="">`:"Sin imagen"};
+function comprimir(file,max,lim){return new Promise((ok,ko)=>{
+  if(!file||!/^image\//.test(file.type))return ko();
+  const u=URL.createObjectURL(file),i=new Image();
+  i.onload=()=>{const r=Math.min(1,max/Math.max(i.width,i.height)),c=document.createElement("canvas");
+    c.width=Math.round(i.width*r);c.height=Math.round(i.height*r);c.getContext("2d").drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(u);
+    let q=.9,d;do{d=c.toDataURL("image/webp",q);q-=.12}while(d.length>lim&&q>.3);
+    d.length>900000?ko():ok(d)};
+  i.onerror=ko;i.src=u})}
+
+$("#frm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const col=colAct,f=e.target,o={};
+  ESQ[col].forEach(x=>{const el=f.elements[x.k];
+    o[x.k]=x.t==="etiquetas"?etqTmp.map(e=>({texto:String(e.texto||"").trim().slice(0,24),color:/^#[0-9a-f]{6}$/i.test(e.color)?e.color:"#742284"})).filter(e=>e.texto):x.t==="images"?imgsTmp.slice():x.t==="lines"?el.value.split("\n").map(l=>l.trim()).filter(Boolean):x.t==="check"?el.checked:x.t==="number"?Number(el.value):x.t==="image"?imgTmp:el.value.trim()});
+  if(col==="productos"){
+    if(!(o.price>=0))return aviso("Escribe un precio válido");
+    o.stock=Math.floor(o.stock);if(!(o.stock>=0))return aviso("Escribe un stock válido (0 o más)");
+    if(!(o.price_en>0))return aviso("Escribe un precio EN válido");
+    o.stock_en=Math.floor(o.stock_en);if(!(o.stock_en>=0))return aviso("Escribe un stock EN válido (0 o más)");
+    o.kind=(o.category==="sobres"||o.category==="selladas")?"pack":"card";o.small=o.kind==="card";
+    o.color=(editando&&editando.color)||"#C8102E";
+    o.id=(editando&&editando.id)||(o.name.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+Math.random().toString(36).slice(2,5));
+    o.orden=editando?editando.orden:Date.now();
+  }else{o.alt=o.title;o.id=(editando&&editando.id)||"slide-"+Date.now();if(!o.orden)o.orden=99}
+  try{
+    await db.collection(col).doc(editando?editando._id:o.id).set(o);
+    $("#dlg").close();aviso("Guardado");cargar(col);
+  }catch(err){console.error(err);aviso("No se pudo guardar. Revisa tu conexión y permisos.")}
+});
+
+const EXP_DEF=Array.from({length:10},(_,i)=>"Expansión "+(i+1));
+async function cargarConfig(){
+  let c={};try{const s=await db.collection("config").doc("tienda").get();c=s.exists?s.data():{}}catch(e){}
+  EXPS=Array.from({length:10},(_,i)=>(Array.isArray(c.expansiones)?c.expansiones[i]:EXP_DEF[i])||"");
+  Object.keys(EXPO).forEach(k=>{if(k!=="")delete EXPO[k]});
+  EXPS.filter(Boolean).forEach(e=>EXPO[e]=e);
+  return c;
+}
+async function cargarTextos(){
+  const c=await cargarConfig();
+  $("#avisoBarra").value=c.avisoBarra||"";
+  $("#tituloFiltro").value=c.tituloFiltro||"";
+  $("#expLista").innerHTML=EXPS.map((e,i)=>`<label>Expansión ${i+1}<input data-exp="${i}" maxlength="40" value="${esc(e)}"></label>`).join("");
+}
+$("#gTextos").onclick=()=>db.collection("config").doc("tienda").set({avisoBarra:$("#avisoBarra").value.trim()},{merge:true})
+  .then(()=>aviso("Guardado")).catch(()=>aviso("No se pudo guardar"));
+$("#gExp").onclick=async()=>{
+  const nuevas=[...document.querySelectorAll("#expLista input")].map(i=>i.value.trim());
+  try{
+    await db.collection("config").doc("tienda").set({expansiones:nuevas,tituloFiltro:$("#tituloFiltro").value.trim()},{merge:true});
+    for(let i=0;i<nuevas.length;i++){
+      const vieja=EXPS[i];if(!vieja||vieja===nuevas[i])continue;
+      const q=await db.collection("productos").where("expansion","==",vieja).get();
+      const b=db.batch();q.docs.forEach(d=>b.update(d.ref,{expansion:nuevas[i]}));if(!q.empty)await b.commit();
+    }
+    aviso("Guardado");cargarTextos();
+  }catch(e){console.error(e);aviso("No se pudo guardar")}
+};
+
+const ESTADOS=["pendiente","pagado","enviado","entregado","cancelado"];let PED=[];
+async function cargarPedidos(){
+  $("#pedLista").innerHTML='<p class="ayuda">Cargando pedidos…</p>';
+  try{
+    const s=await db.collectionGroup("pedidos").limit(200).get();
+    PED=s.docs.map(d=>({ref:d.ref,id:d.id,uid:d.ref.parent.parent.id,...d.data()})).sort((a,b)=>((b.creado&&b.creado.seconds)||9e9)-((a.creado&&a.creado.seconds)||9e9));
+    const U={};await Promise.all([...new Set(PED.map(p=>p.uid))].map(u=>db.collection("usuarios").doc(u).get().then(x=>U[u]=x.data()||{}).catch(()=>U[u]={})));
+    PED.forEach(p=>p.u=U[p.uid]);pintarPedidos();
+  }catch(e){console.error(e);$("#pedLista").innerHTML='<div class="vacio">No se pudieron cargar los pedidos. Revisa que publicaste las reglas de Firestore.</div>'}
+}
+function pintarPedidos(){
+  const f=$("#fEst").value,L=PED.filter(p=>!f||p.estado===f);
+  $("#pedLista").innerHTML=L.length?L.map(p=>{
+    const fe=p.creado&&p.creado.toDate?p.creado.toDate().toLocaleString("es-PE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):"Procesando";
+    const u=p.u||{};
+    return `<article class="ped"><header><div><b>Pedido #${esc(p.id.slice(-6).toUpperCase())}</b> <small>${esc(fe)} · ${esc(p.metodo||"—")}</small></div>
+     <select data-est="${esc(p.id)}">${ESTADOS.map(s=>`<option ${p.estado===s?"selected":""}>${s}</option>`).join("")}</select></header>
+     <p>${esc(u.nombre||u.alias||"Cliente")}${u.telefono?" · Tel. "+esc(u.telefono):""}${u.email?" · "+esc(u.email):""}</p>
+     ${p.envio?`<p><small>Envío a ${esc(p.envio.nombre)}${p.envio.direccion?" — "+esc(p.envio.direccion):""}</small></p>`:""}
+     <ul>${(p.items||[]).map(i=>`<li>${esc(i.name)} × ${Number(i.qty)||1}</li>`).join("")}</ul>
+     ${p.cupon?`<p><small>Cupón ${esc(p.cupon)} · −S/ ${(Number(p.descuento)||0).toFixed(2)}</small></p>`:""}
+     <p><b>Total: S/ ${(Number(p.total)||0).toFixed(2)}</b></p></article>`}).join("")
+   :'<div class="vacio">No hay pedidos para mostrar.</div>';
+}
+$("#fEst").onchange=pintarPedidos;
+
+let CUP=[];
+const descCup=c=>c.tipo==="monto"?"S/ "+Number(c.valor).toFixed(2)+" de descuento":Number(c.valor)+"% de descuento";
+function restanteCup(ms){
+  if(ms<=0)return null;
+  const m=Math.floor(ms/60000),d=Math.floor(m/1440),h=Math.floor((m%1440)/60),mi=m%60;
+  return d?d+" d "+h+" h":h?h+" h "+mi+" min":Math.max(1,mi)+" min";
+}
+async function cargarCupones(){
+  $("#cupLista").innerHTML='<p class="ayuda">Cargando cupones…</p>';
+  try{
+    const s=await db.collection("cupones").get();
+    CUP=s.docs.map(d=>({_id:d.id,...d.data()})).sort((x,y)=>((y.vence&&y.vence.seconds)||0)-((x.vence&&x.vence.seconds)||0));
+    pintarCupones();
+  }catch(e){console.error(e);$("#cupLista").innerHTML='<div class="vacio">No se pudieron cargar los cupones. Revisa que publicaste las reglas de Firestore para <code>cupones</code>.</div>'}
+}
+function pintarCupones(){
+  const ahora=Date.now();
+  $("#cupLista").innerHTML=CUP.length?CUP.map(c=>{
+    const v=c.vence&&c.vence.toMillis?c.vence.toMillis():0,r=restanteCup(v-ahora),
+      fe=v?new Date(v).toLocaleString("es-PE",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"—";
+    return `<div class="cup${c.activo===false?" off":""}">
+      <div><b class="cod">${esc(c._id)}</b></div>
+      <div><b>${esc(descCup(c))}</b></div>
+      <div>${r?`<span class="ok">Vence en ${esc(r)}</span>`:`<span class="vencido">Vencido</span>`}<small>${esc(fe)}</small></div>
+      <label class="sw"><input type="checkbox" data-cact="${esc(c._id)}" ${c.activo!==false?"checked":""}>Activo</label>
+      <button data-ccop="${esc(c._id)}">Copiar</button>
+      <button class="peligro" data-cdel="${esc(c._id)}">Eliminar</button></div>`}).join("")
+   :'<div class="vacio">Aún no hay cupones. Crea el primero arriba.</div>';
+}
+setInterval(()=>{if(!$("#v-cupones").hidden&&CUP.length)pintarCupones()},30000);
+$("#cGen").onclick=()=>{const L="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";for(let i=0;i<8;i++)t+=L[Math.floor(Math.random()*L.length)];$("#cCod").value=t};
+$("#cupForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const cod=$("#cCod").value.trim().toUpperCase().replace(/\s+/g,""),tipo=$("#cTipo").value,val=Number($("#cVal").value),dur=Number($("#cDur").value),uni=$("#cUni").value;
+  if(!/^[A-Z0-9_-]{3,20}$/.test(cod))return aviso("El código debe tener de 3 a 20 letras, números, - o _");
+  if(!(val>0)||(tipo==="porcentaje"&&val>100))return aviso(tipo==="porcentaje"?"El porcentaje debe estar entre 1 y 100":"Escribe un monto válido");
+  if(!(dur>0))return aviso("Escribe una duración válida");
+  const b=$("#cCrear");b.disabled=true;
+  try{
+    const ref=db.collection("cupones").doc(cod),ex=await ref.get();
+    if(ex.exists&&!confirm("El código "+cod+" ya existe. ¿Reemplazarlo con los nuevos datos?")){b.disabled=false;return}
+    const ms=dur*(uni==="h"?3600000:86400000);
+    await ref.set({codigo:cod,tipo,valor:val,vence:firebase.firestore.Timestamp.fromMillis(Date.now()+ms),creado:firebase.firestore.FieldValue.serverTimestamp(),activo:true});
+    aviso("Cupón creado");$("#cupForm").reset();$("#cDur").value=7;cargarCupones();
+  }catch(err){console.error(err);aviso("No se pudo crear el cupón. Revisa las reglas de Firestore.")}
+  b.disabled=false;
+});
+$("#cupLista").addEventListener("click",async e=>{
+  const cp=e.target.closest("[data-ccop]"),dl=e.target.closest("[data-cdel]");
+  if(cp){try{await navigator.clipboard.writeText(cp.dataset.ccop);aviso("Código copiado")}catch(x){aviso(cp.dataset.ccop)}}
+  if(dl&&confirm("¿Eliminar el cupón "+dl.dataset.cdel+"?")){try{await db.collection("cupones").doc(dl.dataset.cdel).delete();aviso("Cupón eliminado");cargarCupones()}catch(x){aviso("No se pudo eliminar")}}
+});
+$("#cupLista").addEventListener("change",async e=>{
+  const id=e.target.dataset.cact;if(!id)return;
+  try{await db.collection("cupones").doc(id).update({activo:e.target.checked});aviso(e.target.checked?"Cupón activado":"Cupón desactivado");cargarCupones()}catch(x){aviso("No se pudo cambiar");cargarCupones()}
+});
+
+function fmtFecha(t){return t&&t.toDate?t.toDate().toLocaleString("es-PE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):""}
+function hojaDe(filas,anchos){const h=XLSX.utils.json_to_sheet(filas);h["!cols"]=anchos.map(w=>({wch:w}));return h}
+$("#bExcel").onclick=async()=>{
+  const b=$("#bExcel");
+  b.disabled=true;b.textContent="Preparando…";
+  try{
+    if(typeof XLSX==="undefined")await new Promise((ok,no)=>{const sc=document.createElement("script");sc.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";sc.onload=ok;sc.onerror=()=>no(new Error("No se pudo cargar la librería de Excel"));document.head.appendChild(sc)});
+    const s=await db.collectionGroup("pedidos").get();
+    const P=s.docs.map(d=>({id:d.id,uid:d.ref.parent.parent.id,...d.data()})).sort((a,c)=>((c.creado&&c.creado.seconds)||9e9)-((a.creado&&a.creado.seconds)||9e9));
+    const U={};
+    await Promise.all([...new Set(P.map(p=>p.uid))].map(u=>db.collection("usuarios").doc(u).get().then(x=>U[u]=x.data()||{}).catch(()=>U[u]={})));
+
+    const compras=P.map(p=>{const u=U[p.uid]||{},e=p.envio||{};return{
+      "Pedido":p.id.slice(-6).toUpperCase(),"Fecha":fmtFecha(p.creado),"Estado":p.estado||"","Método de pago":p.metodo||"",
+      "Cliente":u.nombre||u.alias||"","DNI":u.dni||"","Teléfono":u.telefono||"","Email":u.email||"","Alias / TikTok":u.alias||"",
+      "Envío a":e.nombre||"","Dirección":e.direccion||"",
+      "Productos":(p.items||[]).map(i=>`${i.name} × ${Number(i.qty)||1}`).join("; "),
+      "Cupón":p.cupon||"","Descuento (S/)":Number(p.descuento)||0,"Subtotal (S/)":Number(p.subtotal)||0,"Envío (S/)":Number(p.shipping)||0,"Total (S/)":Number(p.total)||0}});
+
+    const G={};
+    P.forEach(p=>{const g=G[p.uid]||(G[p.uid]={u:U[p.uid]||{},n:0,total:0,prim:null,ult:null});
+      g.n++;if(p.estado!=="cancelado")g.total+=Number(p.total)||0;
+      const t=p.creado&&p.creado.seconds;if(t){if(g.prim===null||t<g.prim)g.prim=t;if(g.ult===null||t>g.ult)g.ult=t}});
+    const f=t=>t?fmtFecha({toDate:()=>new Date(t*1000)}):"";
+    const usuarios=Object.values(G).sort((a,c)=>c.total-a.total).map(g=>({
+      "Nombre":g.u.nombre||"","Alias / TikTok":g.u.alias||"","DNI":g.u.dni||"","Teléfono":g.u.telefono||"","Email":g.u.email||"",
+      "Compras":g.n,"Total gastado (S/)":Math.round(g.total*100)/100,"Primera compra":f(g.prim),"Última compra":f(g.ult)}));
+
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,hojaDe(compras,[9,17,11,14,22,10,11,28,16,22,34,60,12,13,13,11,11]),"Compras");
+    XLSX.utils.book_append_sheet(wb,hojaDe(usuarios,[24,16,10,11,28,9,17,17,17]),"Usuarios");
+    XLSX.writeFile(wb,"MegaPokeStore-compras-"+new Date().toISOString().slice(0,10)+".xlsx");
+    aviso(compras.length?"Excel descargado":"Excel descargado (aún no hay compras)");
+  }catch(e){console.error(e);aviso("No se pudo generar el Excel")}
+  b.disabled=false;b.textContent="Descargar Excel";
+};
+function moverStock(items,signo){
+  const G={};(items||[]).forEach(i=>{const g=G[i.id]||(G[i.id]={ref:db.collection("productos").doc(String(i.id)),stock:0,stock_en:0});g[i.ed==="en"?"stock_en":"stock"]+=Number(i.qty)||0});
+  const L=Object.values(G);
+  return db.runTransaction(async tx=>{
+    const snaps=await Promise.all(L.map(g=>tx.get(g.ref)));
+    snaps.forEach((s,k)=>{if(!s.exists)return;const d=s.data(),upd={};
+      ["stock","stock_en"].forEach(c=>{if(L[k][c]&&typeof d[c]==="number")upd[c]=Math.max(0,d[c]+signo*L[k][c])});
+      if(Object.keys(upd).length)tx.update(L[k].ref,upd)})})}
+$("#pedLista").addEventListener("change",async e=>{
+  const p=PED.find(x=>x.id===e.target.dataset.est);if(!p)return;
+  const nuevo=e.target.value,prev=p.estado;
+  try{
+    const upd={estado:nuevo};
+    if(nuevo==="cancelado"&&prev!=="cancelado"&&p.stockDescontado===true){await moverStock(p.items,1);upd.stockDescontado=false}
+    else if(prev==="cancelado"&&nuevo!=="cancelado"&&p.stockDescontado===false){await moverStock(p.items,-1);upd.stockDescontado=true}
+    await p.ref.update(upd);Object.assign(p,upd);aviso(upd.stockDescontado===false?"Cancelado: stock devuelto":"Estado actualizado")}
+  catch(err){console.error(err);aviso("No se pudo cambiar el estado");pintarPedidos()}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finalizar compra — MegaPokeStore</title>
+<link rel="icon" type="image/png" href="img/LOGO.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<link rel="stylesheet" href="styles.css">
+<style>
+.summary-coupon{margin-bottom:6px}
+.summary-coupon-row{display:flex;gap:8px}
+.summary-coupon-row input{flex:1;min-width:0;border:1px solid rgba(255,255,255,.25);background:#fff;color:#171717;border-radius:8px;padding:9px 11px;font-size:.88rem;text-transform:uppercase}
+.summary-coupon-row input:disabled{background:#eee}
+.summary-coupon-row button{border:0;border-radius:8px;padding:9px 14px;font-weight:700;font-size:.82rem;background:#F5B400;color:#171717;cursor:pointer}
+.summary-coupon-row button:disabled{opacity:.6;cursor:default}
+.summary-coupon-msg{font-size:.78rem;margin:6px 0 0;min-height:1em;color:rgba(255,255,255,.7)}
+.summary-coupon-msg.ok{color:#7be0a0}.summary-coupon-msg.err{color:#ff9d9d}
+#summaryDiscount{color:#7be0a0;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="utility-bar-inner">
+    <span class="utility-message"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 7h11v9H2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 10h4l3 3v3h-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6" cy="18" r="1.8" fill="currentColor"/><circle cx="17" cy="18" r="1.8" fill="currentColor"/></svg>Envíos a todo el Perú gratis</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="header-bar">
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mainNav">
+      <span class="menu-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="menu-toggle-label">Menú</span>
+    </button>
+
+    <a href="index.html" class="logo">
+      <img src="img/LOGO.png" alt="MegaPokeStore" class="logo-img">
+      <span class="logo-title">MegaPokeStore</span>
+    </a>
+
+    <div class="header-search-inline">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Buscar productos, cartas, mazos…">
+        <button class="search-btn" id="searchBtn" aria-label="Buscar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="account-btn" id="accountBtn" data-bs-toggle="modal" data-bs-target="#loginModal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Ingresar</span>
+      </button>
+      <button class="cart-btn" id="cartToggle" data-bs-toggle="offcanvas" data-bs-target="#cartDrawer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6h15l-1.5 9h-12z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="17" cy="20" r="1.5" fill="currentColor"/><path d="M6 6 5 3H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Carrito</span>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="category-nav-wrap navbar navbar-expand-lg navbar-dark">
+    <div class="category-navbar-inner">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#categoryNavCollapse" aria-controls="categoryNavCollapse" aria-expanded="false" aria-label="Abrir categorías">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="categoryNavCollapse">
+        <div class="main-tabs" id="mainTabs" role="tablist" aria-label="Secciones de la tienda">
+          <div class="mega-nav-item">
+            <a href="index.html">Inicio</a>
+          </div>
+          <div class="mega-nav-item">
+            <a href="index.html?nav=sobres">Productos</a>
+          </div>
+          <div class="mega-nav-item">
+            <a href="index.html?nav=singles">Cartas</a>
+          </div>
+          <div class="mega-nav-item">
+            <a href="index.html?nav=mazos">Mazos</a>
+          </div>
+          <div class="mega-nav-item mega-align-right">
+            <a href="index.html?nav=accesorios">Accesorios</a>
+          </div>
+          <div class="mega-nav-item mega-align-right">
+            <a href="index.html?nav=dinamicas">Dinámicas</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="category-overlay" id="categoryOverlay"></div>
+<aside class="category-drawer" id="mainNav" aria-hidden="true">
+  <div class="category-drawer-head">
+    <h2>Menú</h2>
+    <button class="category-close" id="categoryClose" aria-label="Cerrar menú">✕</button>
+  </div>
+  <nav class="category-links" id="mobileTabs">
+    <a href="index.html">Inicio</a>
+    <a href="index.html?nav=sobres">Productos</a>
+    <a href="index.html?nav=singles">Cartas individuales</a>
+    <a href="index.html?nav=mazos">Mazos</a>
+    <a href="index.html?nav=accesorios">Accesorios</a>
+    <a href="index.html?nav=dinamicas">Dinámicas</a>
+    <a href="envios-y-entregas.html">Envíos y entregas</a>
+  </nav>
+</aside>
+
+<main>
+
+  <div class="category-hero">
+    <div class="category-hero-inner">
+      <span class="category-crumb">MegaPokeStore <b>/</b> Finalizar compra</span>
+      <h1>Ya casi está. Solo faltan unos datos.</h1>
+      <p>Elige tu método de pago para confirmar el pedido.</p>
+    </div>
+  </div>
+
+  <section class="info-page">
+
+    <div id="checkoutEmpty" class="checkout-empty" style="display:none;">
+      <h2>No tienes un pedido en proceso</h2>
+      <p>Agrega productos a tu carrito desde la tienda para continuar con el pago.</p>
+      <a href="index.html" class="btn btn-primary">Ir a la tienda</a>
+    </div>
+
+    <div id="checkoutContent">
+      <div class="checkout-layout">
+
+        <div class="checkout-form-card">
+          <form id="checkoutForm" novalidate>
+
+            <div class="checkout-section">
+              <h2>Elige cómo pagar</h2>
+
+              <div class="pay-methods" role="radiogroup" aria-label="Método de pago">
+                <label class="pay-method is-active" for="payMp">
+                  <input type="radio" name="metodoPago" id="payMp" value="mercadopago" checked>
+                  <span class="pay-method-body">
+                    <img src="img/mercadopago.png" alt="Mercado Pago" class="pay-method-logo" style="height:30px;width:auto">
+                    <span class="pay-method-name">Mercado Pago</span>
+                  </span>
+                </label>
+                <label class="pay-method" for="payYape">
+                  <input type="radio" name="metodoPago" id="payYape" value="yape">
+                  <span class="pay-method-body">
+                    <img src="img/yape.png" alt="Yape" class="pay-method-logo" style="height:30px;width:auto">
+                    <span class="pay-method-name">Yape</span>
+                  </span>
+                </label>
+              </div>
+
+              <div class="mp-payment-box mp-panel" id="panelMp">
+                <label>Nombre completo
+                  <input type="text" name="nombre" class="form-control" required placeholder="Nombres y apellidos">
+                </label>
+                <div class="mp-amount"><span>Monto a pagar</span><b id="mpAmount">S/ 0.00</b></div>
+                <p>Al continuar, serás redirigido a Mercado Pago para completar tu pago de forma segura (tarjeta, Yape, Plin, cuenta Mercado Pago, etc).</p>
+                <button type="submit" class="btn btn-primary w-100 checkout-submit" id="checkoutSubmit">
+                  Pagar con link de Mercado Pago
+                </button>
+                <p class="checkout-secure-note" id="checkoutSecureNote">🔒 Serás redirigido al link de pago oficial de Mercado Pago. MegaPokeStore no almacena datos de tu tarjeta.</p>
+              </div>
+
+              <div class="mp-payment-box yape-payment-box" id="panelYape" style="display:none;">
+                <div class="mp-amount"><span>Monto a pagar</span><b id="yapeMonto">S/ 0.00</b></div>
+                <p>Paga con Yape escaneando nuestro QR. Luego nos envías la captura por WhatsApp para confirmar tu pedido.</p>
+                <button type="button" class="btn btn-primary yape-pay-btn" id="yapePayBtn">Pagar con Yape</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <aside class="order-summary" id="orderSummary">
+          <h2>Resumen del pedido</h2>
+          <div class="order-summary-items" id="orderSummaryItems"></div>
+          <div class="summary-coupon">
+            <div class="summary-coupon-row"><input type="text" id="couponInput" placeholder="Código de descuento" maxlength="20" autocomplete="off"><button type="button" id="couponBtn">Aplicar</button></div>
+            <p class="summary-coupon-msg" id="couponMsg"></p>
+          </div>
+          <div class="cart-row"><span>Subtotal</span><span id="summarySubtotal">S/ 0.00</span></div>
+          <div class="cart-row" id="summaryDiscountRow" style="display:none"><span id="summaryDiscountLabel">Descuento</span><span id="summaryDiscount">- S/ 0.00</span></div>
+          <div class="cart-row"><span>Envío</span><span id="summaryShipping">S/ 0.00</span></div>
+          <div class="cart-row cart-total"><span>Total</span><span id="summaryTotal">S/ 0.00</span></div>
+        </aside>
+
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="img/LOGO.png" alt="MegaPokeStore" class="logo-img">
+          <span class="logo-title">MegaPokeStore</span>
+        </div>
+        <p class="footer-blurb">Marketplace de cartas coleccionables TCG: sobres sellados, disponibles verificados y mazos listos para jugar, con envíos a todo el Perú.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Ayuda</h4>
+        <ul>
+          <li><a href="envios-y-entregas.html">Envíos y entregas</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>MegaPokeStore</h4>
+        <ul>
+          <li><a href="sobre-nosotros.html">Sobre nosotros</a></li>
+        </ul>
+      </div>
+      <div class="footer-col footer-social-col">
+        <h4>Síguenos</h4>
+        <div class="footer-social">
+          <a class="social-icon" href="https://www.tiktok.com/@TU_USUARIO_PRINCIPAL" target="_blank" rel="noopener" aria-label="TikTok cuenta principal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 2h-3v13.2a2.9 2.9 0 1 1-2.05-2.77V9.3a5.9 5.9 0 1 0 5.05 5.84V8.35a7.3 7.3 0 0 0 4.5 1.55v-3a4.3 4.3 0 0 1-4.5-4.4z"/></svg>
+            <span class="social-label">Cuenta principal</span>
+          </a>
+          <a class="social-icon" href="https://www.tiktok.com/@TU_USUARIO_SECUNDARIO" target="_blank" rel="noopener" aria-label="TikTok cuenta secundaria">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 2h-3v13.2a2.9 2.9 0 1 1-2.05-2.77V9.3a5.9 5.9 0 1 0 5.05 5.84V8.35a7.3 7.3 0 0 0 4.5 1.55v-3a4.3 4.3 0 0 1-4.5-4.4z"/></svg>
+            <span class="social-label">Cuenta secundaria</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 MegaPokeStore — sitio de demostración, catálogo de muestra.</span>
+      <span>Hecho para quienes abren un sobre y siempre esperan el golpe de suerte.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="offcanvas offcanvas-end cart-drawer" tabindex="-1" id="cartDrawer" aria-labelledby="cartDrawerLabel">
+  <div class="offcanvas-header cart-header">
+    <h2 class="offcanvas-title" id="cartDrawerLabel">Tu carrito</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar carrito"></button>
+  </div>
+
+  <div class="offcanvas-body d-flex flex-column">
+    <div class="cart-items" id="cartItems"></div>
+
+    <div class="cart-empty" id="cartEmpty">
+      <p>Tu carrito está vacío.</p>
+      <p class="cart-empty-sub">Ve a la tienda para agregar algún sobre o carta disponible.</p>
+    </div>
+
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+      <div class="cart-row"><span>Subtotal</span><span id="cartSubtotal">S/ 0.00</span></div>
+      <div class="cart-row"><span>Envío</span><span id="cartShipping">S/ 0.00</span></div>
+      <div class="cart-row cart-total"><span>Total</span><span id="cartTotal">S/ 0.00</span></div>
+      <a href="index.html" class="btn btn-primary w-100 btn-checkout">Ir a la tienda</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content login-modal-content">
+      <div class="modal-header border-0 pb-0">
+        <span class="login-eyebrow">Área de coleccionistas</span>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body pt-0">
+        <div class="login-modal-head">
+          <h2 id="authTitle">Ingresa a tu cuenta</h2>
+          <p id="authSubtitle">Guarda tu carrito, sigue tus pedidos y entérate primero de los sobres nuevos.</p>
+        </div>
+
+        <button class="btn btn-outline-secondary google-btn" id="googleSignIn" type="button">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+            <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18z"/>
+            <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/>
+            <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58z"/>
+          </svg>
+          Continuar con Google
+        </button>
+
+        <div class="login-divider"><span>o con tu correo</span></div>
+
+        <p class="auth-error" id="authError" style="display:none;"></p>
+
+        <form class="login-form" id="loginForm">
+          <label>Correo electrónico
+            <input type="email" name="email" class="form-control" placeholder="tu@correo.com" autocomplete="email" required>
+          </label>
+          <label>Contraseña
+            <input type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
+          </label>
+          <button type="submit" class="btn btn-primary w-100 login-submit">Iniciar sesión</button>
+        </form>
+
+        <form class="login-form" id="registerForm" style="display:none;">
+          <label>Nombre
+            <input type="text" name="name" class="form-control" placeholder="Tu nombre" autocomplete="name" required>
+          </label>
+          <label>Correo electrónico
+            <input type="email" name="email" class="form-control" placeholder="tu@correo.com" autocomplete="email" required>
+          </label>
+          <label>Contraseña
+            <input type="password" name="password" class="form-control" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required>
+          </label>
+          <button type="submit" class="btn btn-primary w-100 login-submit">Crear cuenta</button>
+        </form>
+
+        <p class="login-foot" id="loginFoot">¿Aún no tienes cuenta? <a href="#" id="switchToRegister">Regístrate gratis</a></p>
+        <p class="login-foot" id="registerFoot" style="display:none;">¿Ya tienes cuenta? <a href="#" id="switchToLogin">Inicia sesión</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="yapeModal" tabindex="-1" aria-labelledby="yapeModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm-plus">
+    <div class="modal-content yape-modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h2 class="modal-title yape-modal-title" id="yapeModalTitle">Paga con Yape</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="yape-amount">Monto a pagar: <b id="yapeAmount">S/ 0.00</b></p>
+
+        <img src="img/yape-qr.png" alt="QR de Yape" class="yape-qr" id="yapeQr">
+
+        <a class="btn yape-wa-btn" id="yapeWhatsappBtn" href="#" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.02 3C9.4 3 4 8.36 4 14.98c0 2.2.6 4.26 1.65 6.04L4 29l8.2-2.15a12.9 12.9 0 0 0 3.82.58h.01c6.63 0 12.02-5.36 12.02-11.98C28.05 8.36 22.66 3 16.02 3zm7.1 17.05c-.3.85-1.72 1.62-2.38 1.72-.6.1-1.36.14-2.2-.14-.5-.16-1.15-.37-1.98-.72-3.5-1.5-5.78-5.02-5.96-5.26-.17-.24-1.43-1.9-1.43-3.62 0-1.73.9-2.57 1.23-2.92.32-.35.7-.44.94-.44.23 0 .47 0 .68.01.22.01.5-.08.79.6.3.7 1 2.43 1.09 2.6.1.18.16.39.03.63-.13.24-.2.39-.39.6-.2.22-.4.48-.58.65-.2.18-.4.38-.17.75.22.37 1 1.63 2.14 2.64 1.47 1.3 2.71 1.71 3.08 1.9.37.19.58.16.8-.1.22-.24.94-1.1 1.19-1.48.25-.37.5-.31.83-.19.34.13 2.17 1.03 2.54 1.21.37.19.62.28.71.44.09.16.09.9-.2 1.75z"/></svg>
+          Enviar captura por WhatsApp
+        </a>
+
+        <p class="yape-note">Mandar captura del pago y colocar tu <b>nombre</b> y tu <b>nickname de TikTok</b>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a class="whatsapp-float" href="https://wa.me/+51935515809?text=Hola%2C%20quisiera%20hacer%20una%20consulta" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <svg width="30" height="30" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.02 3C9.4 3 4 8.36 4 14.98c0 2.2.6 4.26 1.65 6.04L4 29l8.2-2.15a12.9 12.9 0 0 0 3.82.58h.01c6.63 0 12.02-5.36 12.02-11.98C28.05 8.36 22.66 3 16.02 3zm7.1 17.05c-.3.85-1.72 1.62-2.38 1.72-.6.1-1.36.14-2.2-.14-.5-.16-1.15-.37-1.98-.72-3.5-1.5-5.78-5.02-5.96-5.26-.17-.24-1.43-1.9-1.43-3.62 0-1.73.9-2.57 1.23-2.92.32-.35.7-.44.94-.44.23 0 .47 0 .68.01.22.01.5-.08.79.6.3.7 1 2.43 1.09 2.6.1.18.16.39.03.63-.13.24-.2.39-.39.6-.2.22-.4.48-.58.65-.2.18-.4.38-.17.75.22.37 1 1.63 2.14 2.64 1.47 1.3 2.71 1.71 3.08 1.9.37.19.58.16.8-.1.22-.24.94-1.1 1.19-1.48.25-.37.5-.31.83-.19.34.13 2.17 1.03 2.54 1.21.37.19.62.28.71.44.09.16.09.9-.2 1.75z"/></svg>
+</a>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="site-common.js"></script>
+<script src="pago.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>

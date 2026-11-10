@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MegaPokeStore — Marketplace de cartas TCG</title>
+<link rel="icon" type="image/png" href="img/LOGO.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<link rel="stylesheet" href="styles.css">
+<style>
+.cart-coupon{margin-bottom:12px}
+.cart-coupon-row{display:flex;gap:8px}
+.cart-coupon-row input{flex:1;min-width:0;border:1px solid #d9d4de;border-radius:8px;padding:9px 11px;font-size:.88rem;text-transform:uppercase}
+.cart-coupon-row button{border:0;border-radius:8px;padding:9px 14px;font-weight:700;font-size:.82rem;background:#171717;color:#fff;cursor:pointer}
+.cart-coupon-msg{font-size:.78rem;margin:6px 0 0;min-height:1em}
+.cart-coupon-msg.ok{color:#1a7f37}.cart-coupon-msg.err{color:#b42318}
+#cartDiscountRow span:last-child{color:#1a7f37;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="utility-bar-inner">
+    <span class="utility-message"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 7h11v9H2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 10h4l3 3v3h-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6" cy="18" r="1.8" fill="currentColor"/><circle cx="17" cy="18" r="1.8" fill="currentColor"/></svg>Envíos a todo el Perú gratis</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="header-bar">
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mainNav">
+      <span class="menu-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="menu-toggle-label">Menú</span>
+    </button>
+
+    <a href="#" class="logo" data-nav="inicio">
+      <img src="img/LOGO.png" alt="MegaPokeStore" class="logo-img">
+      <span class="logo-title">MegaPokeStore</span>
+    </a>
+
+    <div class="header-search-inline">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Buscar productos, cartas, mazos…">
+        <button class="search-btn" id="searchBtn" aria-label="Buscar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="account-btn" id="accountBtn" data-bs-toggle="modal" data-bs-target="#loginModal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Ingresar</span>
+      </button>
+      <button class="cart-btn" id="cartToggle" data-bs-toggle="offcanvas" data-bs-target="#cartDrawer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6h15l-1.5 9h-12z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="17" cy="20" r="1.5" fill="currentColor"/><path d="M6 6 5 3H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Carrito</span>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="category-nav-wrap navbar navbar-expand-lg navbar-dark">
+    <div class="category-navbar-inner">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#categoryNavCollapse" aria-controls="categoryNavCollapse" aria-expanded="false" aria-label="Abrir categorías">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="categoryNavCollapse">
+        <div class="main-tabs" id="mainTabs" role="tablist" aria-label="Secciones de la tienda">
+          <div class="mega-nav-item">
+            <a href="#" role="tab" aria-selected="true" data-nav="inicio" class="active" aria-haspopup="true">Inicio</a>
+            <div class="mega-menu mega-menu-simple" id="megaMenu-inicio"></div>
+          </div>
+          <div class="mega-nav-item">
+            <a href="#" role="tab" aria-selected="false" data-nav="sobres" aria-haspopup="true">Productos</a>
+            <div class="mega-menu" id="megaMenu-sobres"></div>
+          </div>
+          <div class="mega-nav-item">
+            <a href="#" role="tab" aria-selected="false" data-nav="singles" aria-haspopup="true">Cartas</a>
+            <div class="mega-menu" id="megaMenu-singles"></div>
+          </div>
+          <div class="mega-nav-item">
+            <a href="#" role="tab" aria-selected="false" data-nav="mazos" aria-haspopup="true">Mazos</a>
+            <div class="mega-menu" id="megaMenu-mazos"></div>
+          </div>
+          <div class="mega-nav-item mega-align-right">
+            <a href="#" role="tab" aria-selected="false" data-nav="accesorios" aria-haspopup="true">Accesorios</a>
+            <div class="mega-menu" id="megaMenu-accesorios"></div>
+          </div>
+          <div class="mega-nav-item mega-align-right">
+            <a href="#" role="tab" aria-selected="false" data-nav="dinamicas">Dinámicas</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="category-overlay" id="categoryOverlay"></div>
+<aside class="category-drawer" id="mainNav" aria-hidden="true">
+  <div class="category-drawer-head">
+    <h2>Menú</h2>
+    <button class="category-close" id="categoryClose" aria-label="Cerrar menú">✕</button>
+  </div>
+  <nav class="category-links" id="mobileTabs">
+    <a href="#" data-nav="inicio" class="active">Inicio</a>
+    <a href="#" data-nav="sobres">Productos</a>
+    <a href="#" data-nav="singles">Cartas individuales</a>
+    <a href="#" data-nav="mazos">Mazos</a>
+    <a href="#" data-nav="accesorios">Accesorios</a>
+    <a href="#" data-nav="dinamicas">Dinámicas</a>
+  </nav>
+</aside>
+
+<main>
+
+  <section class="page active" id="page-inicio" data-page="inicio">
+
+    <div class="hero">
+      <div class="hero-carousel" aria-label="Promociones destacadas">
+        <div class="hero-carousel-track" id="heroCarouselTrack"></div>
+        <div class="hero-carousel-controls">
+          <div class="hero-carousel-dots" id="heroCarouselDots"></div>
+          <button type="button" class="hero-carousel-pause" id="heroCarouselPause" aria-label="Pausar carrusel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section class="trust" aria-labelledby="trustTitle">
+      <div class="trust-inner">
+        <div class="trust-media">
+          <svg viewBox="0 0 520 440" role="img" aria-label="Cartas coleccionables con un sello de productos originales" xmlns="http://www.w3.org/2000/svg">
+            <g transform="rotate(-6 260 215)">
+              <polygon points="260,28 424,122 424,308 260,402 96,308 96,122" fill="#C8102E" stroke="#C8102E" stroke-width="40" stroke-linejoin="round"/>
+              <polygon points="260,28 424,122 424,308 260,402 96,308 96,122" fill="none" stroke="#F5B400" stroke-width="3" stroke-linejoin="round" opacity=".55" transform="translate(260 215) scale(.84) translate(-260 -215)"/>
+            </g>
+
+            <g transform="translate(205 222) rotate(-13)">
+              <rect x="-66" y="-92" width="132" height="184" rx="11" fill="#0B0B0C"/>
+              <rect x="-56" y="-82" width="112" height="164" rx="6" fill="none" stroke="#F5B400" stroke-width="2"/>
+              <path d="M0 -34 L10 -10 L34 0 L10 10 L0 34 L-10 10 L-34 0 L-10 -10 Z" fill="#F5B400"/>
+            </g>
+
+            <g transform="translate(305 205) rotate(9)">
+              <rect x="-70" y="-98" width="140" height="196" rx="11" fill="#FFFFFF" stroke="#E7E2DA" stroke-width="2"/>
+              <rect x="-58" y="-86" width="116" height="16" rx="4" fill="#F6F4F1"/>
+              <rect x="-52" y="-82" width="52" height="8" rx="3" fill="#18120F"/>
+              <rect x="-58" y="-60" width="116" height="94" rx="6" fill="#0B0B0C"/>
+              <path d="M0 -46 L32 -34 V-6 C32 12 16 24 0 30 C-16 24 -32 12 -32 -6 V-34 Z" fill="#C8102E"/>
+              <path d="M-14 -8 L-4 3 L15 -20" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="-58" y="44" width="80" height="6" rx="3" fill="#E7E2DA"/>
+              <rect x="-58" y="58" width="116" height="6" rx="3" fill="#E7E2DA"/>
+              <rect x="-58" y="72" width="96" height="6" rx="3" fill="#E7E2DA"/>
+            </g>
+
+            <g transform="translate(118 352)">
+              <polygon points="0,-66 57,-33 57,33 0,66 -57,33 -57,-33" fill="#F5B400" stroke="#F5B400" stroke-width="12" stroke-linejoin="round"/>
+              <polygon points="0,-58 51,-29 51,29 0,58 -51,29 -51,-29" fill="none" stroke="#0B0B0C" stroke-width="2" stroke-linejoin="round" opacity=".35"/>
+              <text x="0" y="-2" text-anchor="middle" font-family="Inter, 'Work Sans', sans-serif" font-weight="800" font-size="30" fill="#0B0B0C">100%</text>
+              <text x="0" y="17" text-anchor="middle" font-family="Inter, 'Work Sans', sans-serif" font-weight="700" font-size="12" fill="#0B0B0C">originales</text>
+              <text x="0" y="31" text-anchor="middle" font-family="Inter, 'Work Sans', sans-serif" font-weight="700" font-size="12" fill="#0B0B0C">y sellados</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="trust-copy">
+          <h2 id="trustTitle">Compra con confianza</h2>
+          <span class="trust-rule" aria-hidden="true"></span>
+          <p>En MegaPokeStore revisamos cada sobre, caja y carta antes de que salga de almacén, y trabajamos solo con distribuidores que garantizan lote de fábrica. Lo que abres es exactamente lo que pediste.</p>
+          <p>cada compra que se haga, no se acepta devoluciones.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="benefits" aria-label="Beneficios de comprar con nosotros">
+      <div class="benefit">
+        <strong>Envíos a todo el Perú</strong>
+        <span>Lima y provincias</span>
+      </div>
+      <div class="benefit">
+        <strong>Pago seguro</strong>
+        <span>Yape y Mercado Pago</span>
+      </div>
+      <div class="benefit">
+        <strong>100% originales</strong>
+        <span>Sellados y verificados</span>
+      </div>
+      <div class="benefit">
+        <strong>Atención directa</strong>
+        <span>Escríbenos por WhatsApp</span>
+      </div>
+    </section>
+
+    <section class="faq" aria-labelledby="faqTitle">
+      <div class="section-head center">
+        <span class="section-eyebrow">Ayuda</span>
+        <h2 id="faqTitle">Preguntas frecuentes</h2>
+      </div>
+      <div class="faq-list">
+        <details>
+          <summary>¿Cómo pago mi pedido?</summary>
+          <p>Puedes pagar con Mercado Pago o con Yape. Con Yape te mostramos el QR y envías tu captura por WhatsApp.</p>
+        </details>
+        <details>
+          <summary>¿Cuánto demora la entrega?</summary>
+          <p>Revisa los tiempos en la página de Envíos y entregas.</p>
+        </details>
+        <details>
+          <summary>¿Cómo uso un cupón?</summary>
+          <p>En la página de pago escribe tu código y presiona "Aplicar".</p>
+        </details>
+      </div>
+    </section>
+
+    <a class="wa-float" href="https://wa.me/+51935515809" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 14c-.2.6-1.2 1.2-1.7 1.2-.4.1-1 .1-3.2-.8-2.7-1.2-4.4-3.9-4.5-4.1-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.1.1.3 0 .5l-.3.4-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.5 1.9 1 .9 1.9 1.2 2.2 1.3.3.１,.4,.１,.6-.１l.8-１c;.２-.３;.４-.２;.６-.１l１;c;.３;.１;.４;.２;.5;.3;.1;.2;.1;.8;-.1;1;Z"/></svg>
+    </a>
+  </section>
+
+  <section class="page" id="page-sobres" data-page="sobres">
+    <div class="category-hero">
+      <div class="category-hero-inner">
+        <span class="category-crumb">MegaPokeStore <b>/</b> Productos</span>
+        <h1>Abre. Revela. Colecciona.</h1>
+        <p>Sobres individuales sellados de fábrica — cada uno con la misma probabilidad de esconder tu próxima carta favorita.</p>
+      </div>
+    </div>
+    <div class="catalog-layout" data-category="sobres">
+      <aside class="filters"></aside>
+      <div class="catalog-main">
+        <div class="catalog-toolbar">
+          <span class="result-count" id="countSobres"></span>
+          <button class="filters-toggle" type="button" data-filters-toggle="sobres" aria-expanded="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Filtros
+            <span class="filters-toggle-count" id="filtersCountSobres"></span>
+          </button>
+          <select class="sort-select" data-sort-for="sobres">
+            <option value="relevancia">Ordenar: Relevancia</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+          </select>
+        </div>
+        <div class="product-grid" id="gridSobres"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-singles" data-page="singles">
+    <div class="category-hero">
+      <div class="category-hero-inner">
+        <span class="category-crumb">MegaPokeStore <b>/</b> Disponibles</span>
+        <h1>La carta exacta que buscas.</h1>
+        <p>Piezas individuales verificadas, ideales para completar una colección o hacerte de esa carta que te falta.</p>
+      </div>
+    </div>
+    <div class="catalog-layout" data-category="singles">
+      <aside class="filters"></aside>
+      <div class="catalog-main">
+        <div class="catalog-toolbar">
+          <span class="result-count" id="countSingles"></span>
+          <button class="filters-toggle" type="button" data-filters-toggle="singles" aria-expanded="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Filtros
+            <span class="filters-toggle-count" id="filtersCountSingles"></span>
+          </button>
+          <select class="sort-select" data-sort-for="singles">
+            <option value="relevancia">Ordenar: Relevancia</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+          </select>
+        </div>
+        <div class="product-grid" id="gridSingles"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-mazos" data-page="mazos">
+    <div class="category-hero">
+      <div class="category-hero-inner">
+        <span class="category-crumb">MegaPokeStore <b>/</b> Mazos</span>
+        <h1>Mazos armados, victorias por delante.</h1>
+        <p>60 cartas balanceadas y listas para jugar — perfectas para empezar o para tu próxima tarde de partidas casuales.</p>
+      </div>
+    </div>
+    <div class="catalog-layout" data-category="mazos">
+      <aside class="filters"></aside>
+      <div class="catalog-main">
+        <div class="catalog-toolbar">
+          <span class="result-count" id="countMazos"></span>
+          <button class="filters-toggle" type="button" data-filters-toggle="mazos" aria-expanded="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Filtros
+            <span class="filters-toggle-count" id="filtersCountMazos"></span>
+          </button>
+          <select class="sort-select" data-sort-for="mazos">
+            <option value="relevancia">Ordenar: Relevancia</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+          </select>
+        </div>
+        <div class="product-grid" id="gridMazos"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-accesorios" data-page="accesorios">
+    <div class="category-hero">
+      <div class="category-hero-inner">
+        <span class="category-crumb">MegaPokeStore <b>/</b> Accesorios</span>
+        <h1>Cuida lo que coleccionas.</h1>
+        <p>Fundas, binders y estuches para que tus cartas se mantengan como el primer día que las abriste.</p>
+      </div>
+    </div>
+    <div class="catalog-layout" data-category="accesorios">
+      <aside class="filters"></aside>
+      <div class="catalog-main">
+        <div class="catalog-toolbar">
+          <span class="result-count" id="countAccesorios"></span>
+          <button class="filters-toggle" type="button" data-filters-toggle="accesorios" aria-expanded="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Filtros
+            <span class="filters-toggle-count" id="filtersCountAccesorios"></span>
+          </button>
+          <select class="sort-select" data-sort-for="accesorios">
+            <option value="relevancia">Ordenar: Relevancia</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+          </select>
+        </div>
+        <div class="product-grid" id="gridAccesorios"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-dinamicas" data-page="dinamicas">
+    <div class="category-hero">
+      <div class="category-hero-inner">
+        <span class="category-crumb">MegaPokeStore <b>/</b> Dinámicas</span>
+        <h1>Juega, abre y comparte con la comunidad.</h1>
+        <p>Participa en las dinamicas de MegaPokeStore.</p>
+      </div>
+    </div>
+    <div class="dynamics-wrap">
+      <div class="dynamics-grid" id="dynamicsGrid">
+        <article class="dynamic-card">
+          <div class="dynamic-media"><img src="img/dinamicas/Energias.jpg" alt="Torneo Regional Lima" loading="lazy"></div>
+          <div class="dynamic-body">
+            <span class="dynamic-tag">Torneo</span>
+            <h3>Torneo Regional Lima</h3>
+            <p>Compite con tu mazo frente a otros jugadores de la comunidad.</p>
+          </div>
+        </article>
+        <article class="dynamic-card">
+          <div class="dynamic-media"><img src="img/dinamicas/PokeDestino.jpg" alt="Noche de Sobres Sellados" loading="lazy"></div>
+          <div class="dynamic-body">
+            <span class="dynamic-tag">Apertura</span>
+            <h3>Noche de Sobres Sellados</h3>
+            <p>Abre sobres sellados junto a otros coleccionistas y comparte tus mejores pulls.</p>
+          </div>
+        </article>
+        <article class="dynamic-card">
+          <div class="dynamic-media"><img src="img/dinamicas/mecha.jpg" alt="Draft Nocturno" loading="lazy"></div>
+          <div class="dynamic-body">
+            <span class="dynamic-tag">Juego</span>
+            <h3>Draft Nocturno</h3>
+            <p>Arma tu mazo al momento con sobres nuevos y juega esa misma noche.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-selladas" data-page="selladas">
+    <div class="category-hero">
+      <div class="category-hero-inner">
+        <span class="category-crumb">MegaPokeStore <b>/</b> Selladas</span>
+        <h1>Piezas de colección, sin abrir.</h1>
+        <p>Cajas y displays completos, directo de fábrica a tu vitrina — para coleccionar o para invertir a largo plazo.</p>
+      </div>
+    </div>
+    <div class="catalog-layout" data-category="selladas">
+      <aside class="filters"></aside>
+      <div class="catalog-main">
+        <div class="catalog-toolbar">
+          <span class="result-count" id="countSelladas"></span>
+          <button class="filters-toggle" type="button" data-filters-toggle="selladas" aria-expanded="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Filtros
+            <span class="filters-toggle-count" id="filtersCountSelladas"></span>
+          </button>
+          <select class="sort-select" data-sort-for="selladas">
+            <option value="relevancia">Ordenar: Relevancia</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+          </select>
+        </div>
+        <div class="product-grid" id="gridSelladas"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-resultados" data-page="resultados">
+    <div class="category-hero">
+      <div class="category-hero-inner">
+        <span class="category-crumb">MegaPokeStore <b>/</b> Búsqueda</span>
+        <h1 id="resultadosTitulo">Resultados de búsqueda</h1>
+        <p>Coincidencias en todo el catálogo para tu búsqueda.</p>
+      </div>
+    </div>
+    <div class="catalog-layout">
+      <aside class="filters" style="visibility:hidden;"></aside>
+      <div class="catalog-main">
+        <div class="catalog-toolbar">
+          <span class="result-count" id="countResultados"></span>
+        </div>
+        <div class="product-grid" id="gridResultados"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="img/LOGO.png" alt="MegaPokeStore" class="logo-img">
+          <span class="logo-title">MegaPokeStore</span>
+        </div>
+        <p class="footer-blurb"></p>
+      </div>
+      <div class="footer-col">
+        <h4>Ayuda</h4>
+        <ul>
+          <li><a href="envios-y-entregas.html">Envíos y entregas</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>MegaPokeStore</h4>
+        <ul>
+          <li><a href="sobre-nosotros.html">Sobre nosotros</a></li>
+        </ul>
+      </div>
+      <div class="footer-col footer-social-col">
+        <h4>Síguenos</h4>
+        <div class="footer-social">
+          <a class="social-icon" href="https://www.tiktok.com/@megapokestore?lang=es" target="_blank" rel="noopener" aria-label="TikTok cuenta principal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 2h-3v13.2a2.9 2.9 0 1 1-2.05-2.77V9.3a5.9 5.9 0 1 0 5.05 5.84V8.35a7.3 7.3 0 0 0 4.5 1.55v-3a4.3 4.3 0 0 1-4.5-4.4z"/></svg>
+            <span class="social-label">Cuenta principal</span>
+          </a>
+          <a class="social-icon" href="https://www.tiktok.com/@mega_pokestore?lang=es" target="_blank" rel="noopener" aria-label="TikTok cuenta secundaria">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 2h-3v13.2a2.9 2.9 0 1 1-2.05-2.77V9.3a5.9 5.9 0 1 0 5.05 5.84V8.35a7.3 7.3 0 0 0 4.5 1.55v-3a4.3 4.3 0 0 1-4.5-4.4z"/></svg>
+            <span class="social-label">Cuenta secundaria</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 MegaPokeStore — sitio de demostración, catálogo de muestra.</span>
+      <span>Hecho para quienes abren un sobre y siempre esperan el golpe de suerte.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="offcanvas offcanvas-end cart-drawer" tabindex="-1" id="cartDrawer" aria-labelledby="cartDrawerLabel">
+  <div class="offcanvas-header cart-header">
+    <h2 class="offcanvas-title" id="cartDrawerLabel">Tu carrito</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar carrito"></button>
+  </div>
+
+  <div class="offcanvas-body d-flex flex-column">
+    <div class="cart-items" id="cartItems"></div>
+
+    <div class="cart-empty" id="cartEmpty">
+      <p>Tu carrito está vacío.</p>
+      <p class="cart-empty-sub">Agrega algún sobre o carta disponible para armar tu próximo pedido.</p>
+    </div>
+
+    <div class="cart-footer" id="cartFooter">
+      <div class="cart-coupon">
+        <div class="cart-coupon-row"><input type="text" id="couponInput" placeholder="Código de descuento" maxlength="20" autocomplete="off"><button type="button" id="couponBtn">Aplicar</button></div>
+        <p class="cart-coupon-msg" id="couponMsg"></p>
+      </div>
+      <div class="cart-row"><span>Subtotal</span><span id="cartSubtotal">S/ 0.00</span></div>
+      <div class="cart-row" id="cartDiscountRow" style="display:none"><span id="cartDiscountLabel">Descuento</span><span id="cartDiscount">- S/ 0.00</span></div>
+      <div class="cart-row"><span>Envío</span><span id="cartShipping">S/ 0.00</span></div>
+      <div class="cart-row cart-total"><span>Total</span><span id="cartTotal">S/ 0.00</span></div>
+      <button class="btn btn-primary w-100 btn-checkout" id="checkoutBtn">Finalizar compra</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content login-modal-content">
+      <div class="modal-header border-0 pb-0">
+        <span class="login-eyebrow">Área de coleccionistas</span>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body pt-0">
+        <div class="login-modal-head">
+          <h2 id="authTitle">Ingresa a tu cuenta</h2>
+          <p id="authSubtitle">Guarda tu carrito, sigue tus pedidos y entérate primero de los sobres nuevos.</p>
+        </div>
+
+        <button class="btn btn-outline-secondary google-btn" id="googleSignIn" type="button">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+            <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18z"/>
+            <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/>
+            <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58z"/>
+          </svg>
+          Continuar con Google
+        </button>
+
+        <div class="login-divider"><span>o con tu correo</span></div>
+
+        <p class="auth-error" id="authError" style="display:none;"></p>
+
+        <form class="login-form" id="loginForm">
+          <label>Correo electrónico
+            <input type="email" name="email" class="form-control" placeholder="tu@correo.com" autocomplete="email" required>
+          </label>
+          <label>Contraseña
+            <input type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
+          </label>
+          <button type="submit" class="btn btn-primary w-100 login-submit">Iniciar sesión</button>
+        </form>
+
+        <form class="login-form" id="registerForm" style="display:none;">
+          <label>Nombre
+            <input type="text" name="name" class="form-control" placeholder="Tu nombre" autocomplete="name" required>
+          </label>
+          <label>Correo electrónico
+            <input type="email" name="email" class="form-control" placeholder="tu@correo.com" autocomplete="email" required>
+          </label>
+          <label>Contraseña
+            <input type="password" name="password" class="form-control" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required>
+          </label>
+          <button type="submit" class="btn btn-primary w-100 login-submit">Crear cuenta</button>
+        </form>
+
+        <p class="login-foot" id="loginFoot">¿Aún no tienes cuenta? <a href="#" id="switchToRegister">Regístrate gratis</a></p>
+        <p class="login-foot" id="registerFoot" style="display:none;">¿Ya tienes cuenta? <a href="#" id="switchToLogin">Inicia sesión</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a class="whatsapp-float" href="https://wa.me/+51935515809?text=Hola%2C%20quisiera%20hacer%20una%20consulta" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <svg width="30" height="30" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.02 3C9.4 3 4 8.36 4 14.98c0 2.2.6 4.26 1.65 6.04L4 29l8.2-2.15a12.9 12.9 0 0 0 3.82.58h.01c6.63 0 12.02-5.36 12.02-11.98C28.05 8.36 22.66 3 16.02 3zm7.1 17.05c-.3.85-1.72 1.62-2.38 1.72-.6.1-1.36.14-2.2-.14-.5-.16-1.15-.37-1.98-.72-3.5-1.5-5.78-5.02-5.96-5.26-.17-.24-1.43-1.9-1.43-3.62 0-1.73.9-2.57 1.23-2.92.32-.35.7-.44.94-.44.23 0 .47 0 .68.01.22.01.5-.08.79.6.3.7 1 2.43 1.09 2.6.1.18.16.39.03.63-.13.24-.2.39-.39.6-.2.22-.4.48-.58.65-.2.18-.4.38-.17.75.22.37 1 1.63 2.14 2.64 1.47 1.3 2.71 1.71 3.08 1.9.37.19.58.16.8-.1.22-.24.94-1.1 1.19-1.48.25-.37.5-.31.83-.19.34.13 2.17 1.03 2.54 1.21.37.19.62.28.71.44.09.16.09.9-.2 1.75z"/></svg>
+</a>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="script.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="auth.js"></script>
+<script src="contenido-tienda.js"></script>
+</body>
+</html>
